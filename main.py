@@ -44,55 +44,65 @@ def setDirectory():
 directoryAsk = tk.Button(root, textvariable=directoryAskTXT, command=setDirectory)
 directoryAsk.grid(column=0, row=0, sticky="nsew")
 
-# currDir = tk.Label(root, textvariable=directory)
-# currDir.grid(column=1, row=0, sticky="nsew")
-
 t2iFrame = tk.Frame(root)
 
-t2iLabel = tk.Label(t2iFrame, text="Prompt:")
-t2iLabel.grid(column=0, row=0, sticky="nsew")
+t2iLabel_Prompt = tk.Label(t2iFrame, text="Prompt")
+t2iLabel_Prompt.grid(column=0, row=0, sticky="nsew")
 
-t2iprompt = tk.StringVar(t2iFrame)
-t2iEntry = tk.Entry(t2iFrame, textvariable=t2iprompt)
-t2iEntry.grid(column=1, row=0, sticky="nsew")
+t2iEntry_Prompt = tk.Entry(t2iFrame, textvariable=tk.StringVar(t2iFrame))
+t2iEntry_Prompt.grid(column=0, row=1, sticky="nsew")
+
+t2iLabel_Count = tk.Label(t2iFrame, text="Count")
+t2iLabel_Count.grid(column=1, row=0, sticky="nsew")
+
+t2iEntry_Count = tk.Entry(t2iFrame, textvariable=tk.StringVar(t2iFrame))
+t2iEntry_Count.grid(column=1, row=1, sticky="nsew")
+
 
 # Tk Images List
 saved_tk_images: List[tk.Label] = []
 
 def generatet2i():
-    if not (t2iEntry.get()):
+    if not t2iEntry_Prompt.get():
         return
+    
+    dir = directory.get() if directory.get() else None
+    
     
     for label in saved_tk_images:
         label.destroy()
 
-    print(f"Prompt: {t2iEntry.get()}")
-    files = openjourney(t2iEntry.get())
+    files = openjourney(
+        dir, 
+        t2iEntry_Prompt.get(), 
+        count=int(t2iEntry_Count.get())
+    )
 
     for imagename, prompt in files.items():
-        print(imagename, prompt)
+        print(prompt)
+        print(f"{imagename}\n")
         image = Image.open(imagename)
         image = image.resize((100, 100)) # Resize the image to fit in grid
         image_tk = ImageTk.PhotoImage(image)
         image_tk_list.append(image_tk)
 
+    imageFrame = tk.Frame(t2iGeneratedFrame)
     # Create a grid of images
     for i in range(len(image_tk_list)):
         row = i // 3 # Three images per row
         col = i % 3
-        imagesLbl = tk.Label(t2iGeneratedFrame, image=image_tk_list[i])
+        imagesLbl = tk.Label(imageFrame, image=image_tk_list[i])
         imagesLbl.grid(row=row, column=col)
         saved_tk_images.append(imagesLbl)
-        
-        
+        imageFrame.grid(row=0, column=0, columnspan=2)
 
 generatet2iBtn = tk.Button(t2iFrame, text="Generate text to image!", command=generatet2i)
-generatet2iBtn.grid(column=0, row=1, columnspan=2, sticky="nsew")
+generatet2iBtn.grid(column=0, row=2, columnspan=2, sticky="nsew")
 
 image_tk_list = []
 
 t2iGeneratedFrame = tk.Frame(t2iFrame)
-t2iGeneratedFrame.grid(column=0, row=2)
+t2iGeneratedFrame.grid(column=0, row=3)
 
 
 i2iFrame = tk.Frame(root)

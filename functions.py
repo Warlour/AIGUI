@@ -2,7 +2,7 @@ import torch
 from diffusers import StableDiffusionPipeline
 device = 'cuda'
 
-def openjourney(prompt:str, negative_prompt:str = None, guidance_scale:float = 7.5, count:int = 1, seed:int = None, steps:int = 50, width:int = 512, height:int = 512) -> dict:
+def openjourney(save_location:str, prompt:str, negative_prompt:str = None, guidance_scale:float = 7.5, count:int = 1, seed:int = None, steps:int = 50, width:int = 512, height:int = 512) -> dict:
     files = {}
 
     try:
@@ -38,7 +38,7 @@ def openjourney(prompt:str, negative_prompt:str = None, guidance_scale:float = 7
             if result.nsfw_content_detected[i] == True:
                 outputtext += f"NSFW detected on image {i + 1} of {count}\n"
 
-            name = f"{i+1}_{filename}"
+            name = f"{i+1}_{filename}" if not save_location else f"{save_location}/{i+1}_{filename}"
             image.save(name, 'PNG')
             files[name] = f"Prompt: {prompt}\nNegative prompt: {negative_prompt}"
     except RuntimeError as e:
